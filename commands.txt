@@ -4,3 +4,8 @@ python run.py --do_train --do_eval --max_examples 100 --train_batch_size 1 --eva
 
 Testing commands :
 python run.py --do_test --eval_batch_size 2
+
+
+IRC collab file Link : https://colab.research.google.com/drive/1Qts_Q-JZtj_lWsOHNjdUZDHS8ybfaSpL#scrollTo=Wscn_t01wXkt
+
+use struct env for training and stuff
