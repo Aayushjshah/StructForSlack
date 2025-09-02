@@ -1,0 +1,6 @@
+Training commands
+python run.py --do_train --do_eval --max_examples 100 --train_batch_size 1 --eval_batch_size 1 --num_train_epochs 2
+08/28/2025 21:44:17 - INFO - __main__ -   device: cpu n_gpu: 0
+
+Testing commands :
+python run.py --do_test --eval_batch_size 2
