@@ -809,7 +809,7 @@ def main():
     label_list = processor.get_labels(args.max_previous_utterance)
     num_labels = len(label_list) 
 
-    config_class, model_class, tokenizer_class = MODEL_CLASSES[args.task_name]
+    config_class, model_class, tokenizer_class = MODEL_CLASSES[args.task_name] #ber_v2 default
 
     config = config_class.from_pretrained(args.model_name_or_path,
                                           num_labels=num_labels,

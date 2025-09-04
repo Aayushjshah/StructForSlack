@@ -1,0 +1,139 @@
+# DiHRL Configuration File
+# Based on "Revisiting Conversation Discourse for Dialogue Disentanglement" Paper
+
+# Dataset Configuration
+data:
+  dataset_name: "ubuntu_irc"
+  data_path: "../jkkummerfeld-irc-disentanglement-82ed04f/data"
+  max_utterance_length: 128
+  context_window_size: 50  # omega parameter from paper
+  batch_size: 2  # dialogues per batch as mentioned in paper
+  num_workers: 4
+
+# Model Configuration
+model:
+  # BERT Configuration
+  bert:
+    model_name: "bert-base-uncased"
+    hidden_size: 768
+    dropout: 0.2
+    
+  # EGCN Configuration
+  egcn:
+    num_layers: 2
+    hidden_sizes: [768, 300]
+    edge_label_embedding_dim: 10
+    activation: "relu"
+    dropout: 0.2
+    
+  # BiLSTM Configuration
+  lstm:
+    num_layers: 2
+    hidden_size: 768
+    bidirectional: true
+    dropout_feedforward: 0.2
+    dropout_recurrent: 0.2
+    
+  # FFNN Configuration
+  ffnn:
+    layer1_hidden_size: 768
+    layer2_hidden_size: 300
+    dropout: 0.2
+    activation: "relu"
+
+# Training Configuration
+training:
+  # Optimizer
+  learning_rate_bert: 6e-6
+  learning_rate_non_bert: 1e-5
+  optimizer: "adamw"
+  weight_decay: 0.01
+  
+  # Learning Rate Scheduler
+  warmup_steps: 1000
+  scheduler: "linear_warmup"
+  
+  # Training Parameters
+  num_epochs: 4
+  early_stopping_patience: 5
+  gradient_clipping: 1.0
+  
+  # Hierarchical Ranking Loss Weights
+  alpha1: 1.0      # Parent utterance level (R1)
+  alpha2: 0.1      # Ancestor utterance level (R2)
+  alpha3: 0.05     # Inner-session utterance level (R3)
+  
+  # Teacher Forcing for Partial-Replying Structure
+  teacher_forcing_noise_prob: 0.15
+
+# Discourse Structure Configuration
+discourse_structures:
+  # Speaker-Utterance Structure
+  speaker_utterance:
+    enabled: true
+    bidirectional: true
+    
+  # Speaker-Mentioning Structure  
+  speaker_mentioning:
+    enabled: true
+    bidirectional: false  # Only from mentioning to mentioned
+    
+  # Utterance-Distance Structure
+  utterance_distance:
+    enabled: true
+    gaussian_mu: 0
+    gaussian_sigma: 0.7071067811865475  # 1/sqrt(2*pi)
+    scale_factor_distance: 2.5066282746310002  # 2*pi*sqrt(2*pi)
+    scale_factor_biaffine: "sqrt_distance"  # sqrt(|i-j|)
+    
+  # Partial-Replying Structure
+  partial_replying:
+    enabled: true
+    bidirectional: true
+    dynamic_update: true  # Updated during inference
+
+# Decoding Configuration
+decoding:
+  strategy: "easy_first"  # or "sequential"
+  confidence_threshold: 0.5
+  
+# Hardware Configuration
+hardware:
+  device: "cuda"
+  mixed_precision: true
+  num_gpus: 1
+  
+# Logging Configuration
+logging:
+  log_level: "INFO"
+  log_dir: "logs"
+  tensorboard_dir: "runs"
+  wandb_project: "dihrl_dialogue_disentanglement"
+  save_checkpoints: true
+  checkpoint_dir: "checkpoints"
+  save_every_n_epochs: 1
+
+# Evaluation Configuration
+evaluation:
+  metrics:
+    cluster_level:
+      - "variation_information"
+      - "adjusted_rand_index"
+      - "one_to_one"
+      - "normalized_mutual_information"
+      - "local_k"
+      - "shen_f1"
+      - "cluster_exact_match"
+    pairwise:
+      - "link_exact_match"
+    additional:
+      - "partial_ari"
+  local_k: 3
+
+# Experiment Configuration
+experiment:
+  name: "dihrl_ubuntu_irc"
+  seed: 42
+  deterministic: true
+  save_predictions: true
+  run_ablation_studies: false
